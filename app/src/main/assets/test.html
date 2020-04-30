@@ -1,20 +1,71 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <style>
-    *:not(input):not(textarea) { -webkit-user-select: none; }
-        body {
-        background: #333;
-        border: 2px solid red;
-        }
+<html lang="de">
 
-    </style>
+<head>
+  <title>Willkommen!</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+
+  </style>
+  <script>
+    const $ = (str) => {return new Intl.NumberFormat().format(str)};
+
+    customElements.define('rule-of-three',
+      class extends HTMLElement {
+        constructor() {
+          super();
+          var templates = document.head.getElementsByTagName('template');
+          var template = (templates.item(Math.floor(Math.random() * Math.floor(templates.length))));
+
+          var n, walk = document.createTreeWalker(
+            template.content,
+            NodeFilter.SHOW_ELEMENT, {
+            acceptNode: function (node) {
+
+              if (!node.dataset.value)
+                return NodeFilter.FILTER_SKIP;
+             // node.textContent = Function('"use strict"; return ('+node.dataset.value+');').call({}, Object.assign({test}={}, template.dataset))
+             function fill(str, {test, a, b}={}) {
+               return eval(str);
+             }
+             node.textContent = fill(node.dataset.value, Object.assign({}, template.dataset) )
+              const returnedTarget = Object.assign(fill, Object.assign({}, template.dataset));
+              returnedTarget.call(returnedTarget,template.dataset);
+              //node.textContent = Function('"use strict"; return ('+node.dataset.value+');').call({}}, Object.assign({}, template.dataset))
+              //console.log('a:' + node.dataset.value + ' b:' + node.nodeName + ' c:' + Boolean(node.dataset.value))
+              return NodeFilter.FILTER_ACCEPT;
+            }
+          }
+            , true);
+          while (n = walk.nextNode());
+
+          for (var d in template.dataset)
+            console.log(d, template.dataset[d])
+          const shadowRoot = this.attachShadow({ mode: 'open' })
+            .appendChild(template.content.cloneNode(true));
+        }
+        toggle() {
+          alert(8)
+        }
+      }
+
+    );
+  </script>
+  <template class="rule-of-three" data-test="12.23">
+    <p>
+     Hier sollen <span data-value="$(parseInt(test)*Number(test))">AAA</span> Zeilen stehen <span data-value="$(test)">BBB</span>
+    </p>
+
+  </template>
 </head>
+
 <body>
-<h1> This Test </h1>
-<h2> Have a nice Night!</h2>
-<a href="index.html">zurück</a>
+  <main>
+    <rule-of-three id="x">
+
+    </rule-of-three>
+  </main>
 </body>
+
 </html>

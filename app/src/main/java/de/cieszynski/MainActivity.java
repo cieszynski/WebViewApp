@@ -1,8 +1,12 @@
 package de.cieszynski;
 
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.pm.PackageInfo;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -13,6 +17,7 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.webkit.WebViewAssetLoader;
+import androidx.webkit.WebViewCompat;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,15 +28,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getWindow().getDecorView().setSystemUiVisibility(
+/*        getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 //| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
         );
         getWindow().setStatusBarColor(Color.TRANSPARENT);
-        //getWindow().setNavigationBarColor(Color.TRANSPARENT);
+        //getWindow().setNavigationBarColor(Color.TRANSPARENT);*/
 
         mWebView = new WebView(this);
+        mWebView.setVerticalScrollBarEnabled(false);
+        mWebView.setBackgroundColor(Color.parseColor("#FFFBE6"));
 
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setUseWideViewPort(true);
@@ -56,11 +63,13 @@ public class MainActivity extends AppCompatActivity {
             Uri path = new Uri.Builder()
                     .scheme("https")
                     .authority(WebViewAssetLoader.DEFAULT_DOMAIN)
-                    .appendPath("index.html")
+                    .appendPath("basil.html")
                     .build();
             mWebView.loadUrl(path.toString());
         }
 
+        PackageInfo webViewPackageInfo = WebViewCompat.getCurrentWebViewPackage(this);
+        Log.d("XXX", "WebView version: " + webViewPackageInfo.versionName.startsWith("82"));
         setContentView(mWebView);
     }
 
@@ -72,10 +81,18 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(mWebView.canGoBack()) {
+        if (mWebView.canGoBack()) {
             mWebView.goBack();
         } else {
             super.onBackPressed();
         }
     }
+
+/*    @Override
+    protected void onResume() {
+        super.onResume();
+
+        ActivityManager.TaskDescription taskDescription = new ActivityManager.TaskDescription(label, icon, colorPrimary);
+        ((Activity)this).setTaskDescription(taskDescription);
+    }*/
 }
